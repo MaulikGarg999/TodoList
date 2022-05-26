@@ -3,9 +3,12 @@
 <body>	
 <?php
 $err="";
+$WorkId="";
+$Description="";
+$WorkDate="";
 $conn=mysqli_connect("localhost","root","","todolist");
 //===================================Insertion Logic=========================================
-if(isset($_POST["sub1"]))
+if(isset($_POST["sub1"])||isset($_POST["sub5"]))
 {
 if(!empty($_POST["t1"])&&!empty($_POST["t2"])&&!empty($_POST["t3"]))
 {	$flag1=0;
@@ -29,7 +32,8 @@ if(!empty($_POST["t1"])&&!empty($_POST["t2"])&&!empty($_POST["t3"]))
 	}
 //====================================Unique Id Validation=====================================
 	$flag=0;
-	if($flag1==0)
+if(isset($_POST["sub1"]))	
+{	if($flag1==0)
 	{
 		$res=mysqli_query($conn,"select WorkId from work");
 		if(mysqli_num_rows($res)>0)
@@ -44,13 +48,36 @@ if(!empty($_POST["t1"])&&!empty($_POST["t2"])&&!empty($_POST["t3"]))
 			}
 		}
 	}
+}
+//==================
+if(isset($_POST["sub5"]))
+{
+if($flag1==0)
+{
+	$res=mysqli_query($conn,"select WorkId from work where WorkId=".$_POST["t1"]);
+		if(!(mysqli_num_rows($res)>0))
+		{
+			$flag=1;
+			$err="No Entry By Serial No ".$_POST["t1"];
+		}	
+}
+}
 //===================================Insertion Of Data========================================
 if($flag==0&&$flag1==0)
 {
-mysqli_query($conn,"Insert into work values(".$_POST["t1"].",'".$_POST["t2"]."','".$_POST["t3"]."','Pending')");
-$err="Work added to the list successfully.";
+	if(isset($_POST["sub1"]))
+	{	
+		mysqli_query($conn,"Insert into work values(".$_POST["t1"].",'".$_POST["t2"]."','".$_POST["t3"]."','Pending')");
+		$err="Work added to the list successfully.";
+	}
+	if(isset($_POST["sub5"]))
+	{
+		mysqli_query($conn,"update work set Description='".$_POST["t2"]."', WorkDate='".$_POST["t3"]."' where WorkId=".$_POST["t1"]);
+		$err="Entry Updated Succuessfully";
+	}
 }
-//==============================================================================================
+
+//=============================================================================================
 }
 else
 	{
@@ -67,7 +94,7 @@ else
 
 if(isset($_POST["sub2"]))
 {
-$i=1;	
+$i=1;	$c=0;
 	if($_POST["noOfrows"]>0)
 	{ 
 		//echo $_POST["noOfrows"];
@@ -77,17 +104,27 @@ $i=1;
 		{	//echo $i;
 			//echo "\n".$_POST["c".$i];
 			mysqli_query($conn,"update work set Status='Completed' where WorkId=".$i);
+			$c++;
 		}
 		$i++;
-	}	
-	$err="Mark Status changed.";
+	}
+	
+	if($c==0)
+	{$err="Please select the entry to change.";}
+	else	
+	{$err="Mark Status changed.";}
+	
+	}
+	else
+	{
+		$err="The list is empty.";
 	}
 }
 //============================Complete Mark Module completed==================================
 //============================Deletion of Entries=============================================
 if(isset($_POST["sub3"]))
 {
-$i=1;	
+$i=1;	$c=0;
 	if($_POST["noOfrows"]>0)
 	{ 
 	while($i<=$_POST["noOfrows"])
@@ -95,14 +132,59 @@ $i=1;
 		if(isset($_POST['c'.$i]))
 		{
 			mysqli_query($conn,"delete from work where WorkId=".$i);
+			$c++;
 		}
 		$i++;
-	}	
-	$err="Entries deleted succesfully";
+	}
+	
+	if($c==0)
+	{$err="Please select the entry to delete.";}
+	else	
+	{$err="Entries deleted succesfully";}
+	
+	}
+	else
+	{
+		$err="Cannot delete.The list is empty.";
+	}
+
+}
+//============================Deletion of Entries completed===================================
+//==========================Display of entries for updation on at a time=======================
+if(isset($_POST["sub4"]))
+{
+$i=1; $c=0;
+if($_POST["noOfrows"]>0)
+	{ 
+	//echo $_POST["noOfrows"];
+	while($i<=$_POST["noOfrows"])
+	{
+		if(isset($_POST['c'.$i]))
+		{	
+			$res=mysqli_query($conn,"select * from work where WorkId=".$i);
+			$row=mysqli_fetch_assoc($res);
+			$WorkId=$row["WorkId"];
+			$Description=$row["Description"];
+			$WorkDate=$row["WorkDate"];	
+			$c=1;
+			//echo "Update time".$i."\n";
+		}
+		if($c==1)
+		{break;}	
+		$i++;
+	}
+		if($i>$_POST["noOfrows"])
+		{
+			$err="Please select entry to update";
+		}	
+	}
+	else
+	{
+		$err="The List is Empty";
 	}
 }
 
-//============================Deletion of Entries completed===================================
+//=============================completed======================================================
 ?>
 <panel>
 <form method=post action=Todo.php> 	
@@ -134,18 +216,22 @@ if(mysqli_num_rows($res)>0)
 <tr>
 <td><input type="submit" value="Mark Complete" name="sub2"></td>
 <td><input type="submit" value="Delete from list" name="sub3"></td>
+<td><input type="submit" value="Update Description" name="sub4"></td>
 <td><input type="hidden" name="noOfrows" value="<?php echo $i ?>"></td>
-<td></td>
 </tr>
 </table>
 </form>
 <!-- Insertion form for the TodoList-->
 <h3>Add another work in the Todo List</h3><br>
 <form method="post" action="Todo.php">
-<input type="text" placeholder="Serial No:" name="t1"><br>	
-<input type="text" placeholder="Work to do..." name="t2"><br>
-<input type="text" placeholder="YYYY-MM-DD" name="t3"><br>
-<input type="submit" name="sub1" value="Add"><br>
+<input type="text" placeholder="Serial No:" name="t1" value="<?php echo $WorkId ?>"><br>
+<!--	
+<input type="text" placeholder="Work to do..." name="t2" value="<?php echo $Description?>"><br>
+-->
+<textarea name="t2" placeholder="Work to do..."><?php echo $Description?></textarea><br>
+<input type="text" placeholder="YYYY-MM-DD" name="t3" value="<?php echo $WorkDate ?>"><br>
+<input type="submit" name="sub1" value="Add">
+<input type="submit" name="sub5" value="Update">
 </form>
 </panel>
 <h3><?php echo $err; ?></h3>
