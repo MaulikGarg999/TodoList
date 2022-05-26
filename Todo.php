@@ -1,6 +1,17 @@
 <html>
-<head><title>[To Do List]</title></head>
-<body>	
+<head>
+<title>[To Do List]</title>
+<link rel="stylesheet" href="/esecforte/bootstrap-3.4.1-dist/css/bootstrap.css">
+<style>
+div.scrollWrapper{
+
+  height:370px;
+  width:700px;
+  overflow:scroll;
+}
+</style>
+</head>
+<body style="background-color: #F5F5F5;">	
 <?php
 $err="";
 $WorkId="";
@@ -204,16 +215,27 @@ if($_POST["noOfrows"]>0)
 
 //=============================completed======================================================
 ?>
-<div style="height:50px;">
-<form style="text-align:right" method="get" action="Todo.php">
-<input type="text" placeholder="Search By Description" name="t4" value="">
-<input type="submit" name="sub6">
+<div style="height:60px; background-color:#DEB887;">
+<form class="form-inline" style="text-align:right; margin-right: 25px;" method="get" action="Todo.php">
+<div class="form-group" style="margin-top: 10px;">
+<input type="text" placeholder="Search By Description" name="t4" value="" class="form-control">
+<input type="submit" name="sub6" class="btn btn-default">
+</div>
 </form>
-	</div>
-<panel>
-<form method=post action=Todo.php> 	
-<table>
-<tr>
+</div>
+<!-- The above html code is for the search form. Below starts the todo list-->
+
+<div class="panel panel-default" style="margin-right: 25px; margin-left: 25px; height: 525px;">
+
+<div class="panel-heading" style="background-color: #FFF8DC;">
+<h3 style="text-align: center;color:#D2B48C; margin-top: 0px;">Your Todo List</h3>
+</div>
+<div class=panel-body>
+
+<form method=post action=Todo.php class="form-inline"> 	
+<div class=scrollWrapper style="width:700px;">
+<table class="table table-bordered">
+<tr style="font-weight: bold;">
 <td>Serial No</td>
 <td>Description</td>
 <td>Date</td>
@@ -237,7 +259,7 @@ if(mysqli_num_rows($res)>0)
 	while($row=mysqli_fetch_assoc($res))	
 	{ 
 	$i++;
-	echo '<tr><td><input type=checkbox name="c'.$row["WorkId"].'" value="'.$row["WorkId"].'">'.$row["WorkId"].'</td>
+	echo '<tr><td><label class="checkbox-inline" style="font-weight:bold;"><input type=checkbox name="c'.$row["WorkId"].'" value="'.$row["WorkId"].'">'.$row["WorkId"].'</label></td>
 	<td>'.$row["Description"].'</td>
 	<td>'.$row["WorkDate"].'</td>
 	<td>'.$row["Status"].'</td></tr>';
@@ -254,28 +276,60 @@ if(mysqli_num_rows($res)>0)
 }
 //=======================================Display of the lists completed========================
 ?>
-<tr>
-<td><input type="submit" value="Mark Complete" name="sub2"></td>
-<td><input type="submit" value="Delete from list" name="sub3"></td>
-<td><input type="submit" value="Update Description" name="sub4"></td>
-<td><input type="hidden" name="noOfrows" value="<?php echo $i ?>"></td>
-</tr>
 </table>
+</div>
+<div class="form-group" style="margin-top:25px;">
+<input type="submit" value="Mark Complete" name="sub2" class="btn btn-default">
+<input type="submit" value="Delete from list" name="sub3" class="btn btn-default" style="margin-left: 40px;">
+<input type="submit" value="Update Description" name="sub4" class="btn btn-default" style="margin-left: 40px;">
+</div>
+<input type="hidden" name="noOfrows" value="<?php echo $i ?>">
 <input type="hidden" name="ListOfWorks" value="<?php echo $wl ?>">
 </form>
+</div>
 <!-- Insertion form for the TodoList-->
-<h3>Add another work in the Todo List</h3><br>
-<form method="post" action="Todo.php">
-<input type="text" placeholder="Serial No:" name="t1" value="<?php echo $WorkId ?>"><br>
-<!--	
-<input type="text" placeholder="Work to do..." name="t2" value=""><br>
--->
-<textarea name="t2" placeholder="Work to do..."><?php echo $Description?></textarea><br>
-<input type="text" placeholder="YYYY-MM-DD" name="t3" value="<?php echo $WorkDate ?>"><br>
-<input type="submit" name="sub1" value="Add">
-<input type="submit" name="sub5" value="Update">
+
+<div class="panel panel-default" style="margin-left: 730px; margin-top:-460px; background-color:#FFF8DC; height: 440px; width: 480px;">
+
+<div class="panel-heading" style="background-color:#DEB887;">
+<h3 style="text-align: center;color:#FFFFFF; margin-top: 2px;">Add Another Work</h3>
+</div>
+
+<div class=panel-body style="height: 325px;">
+<form method="post" action="Todo.php" class="form-horizontal">
+
+<div class="form-group" style="margin-left: 10px;margin-top: 20px;">
+<div class="col-sm-10">
+<input type="text" placeholder="Serial No:" name="t1" value="<?php echo $WorkId ?>" class="form-control">
+</div>
+</div>
+
+<div class=form-group style="margin-left: 10px;">
+<div class="col-sm-10">
+<textarea name="t2" placeholder="Work to do..." rows="5" class="form-control"><?php echo $Description?></textarea>
+</div>
+</div>
+
+<div class=form-group style="margin-left: 10px;">
+<div class="col-sm-10">
+<input type="text" placeholder="YYYY-MM-DD" name="t3" value="<?php echo $WorkDate ?>" class="form-control">
+</div>
+</div>
+
+<div class=form-group>
+<input type="submit" name="sub1" value="Add" class="btn btn-default" style="margin-left:140px; width: 70px;">
+	
+<input type="submit" name="sub5" value="Update" class="btn btn-default" style="">
+</div>
 </form>
-</panel>
-<h3><?php echo $err; ?></h3>
+</div>
+<div class="panel-footer" style="height: 53px; background-color:#DEB887;">
+	<h5 style="color: red; text-align: center;"><?php echo $err; ?></h5>
+</div>
+
+</div>
+
+
+</div>
 </body>
 </html>
