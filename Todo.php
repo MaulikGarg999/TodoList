@@ -18,7 +18,6 @@ $WorkId="";
 $Description="";
 $WorkDate="";
 $search="";
-//$arr=array();
 $wl="";
 $conn=mysqli_connect("localhost","root","","todolist");
 //===================================Insertion Logic=========================================
@@ -108,18 +107,15 @@ else
 
 if(isset($_POST["sub2"]))
 {
-$i=1;	$c=0;
+	$i=1;	$c=0;
 	if($_POST["noOfrows"]>0)
 	{ 
-		//echo $_POST["noOfrows"];
-		//echo $_POST["ListOfWorks"];
+	$arr=explode("#",$_POST["ListOfWorks"]);	
 	while($i<=$_POST["noOfrows"])
-	{	$cha=substr($_POST["ListOfWorks"],$i-1,1);
-		//echo "-".$cha."-";
-		if(isset($_POST['c'.$cha]))
-		{	//echo $i;
-			//echo "\n".$_POST["c".$i];
-			mysqli_query($conn,"update work set Status='Completed' where WorkId=".$cha);
+	{	
+		if(isset($_POST['c'.$arr[$i-1]]))
+		{	
+			mysqli_query($conn,"update work set Status='Completed' where WorkId=".$arr[$i-1]);
 			$c++;
 		}
 		$i++;
@@ -143,30 +139,21 @@ if(isset($_POST["sub3"]))
 $i=1;	$c=0;
 	if($_POST["noOfrows"]>0)
 	{ 
-	/*$arr1=$_POST["ListOfWorks"];
-	$j=1;
-	while($arr1[$j])
-	{
-		echo $arr1[$j];
-		$j++;
-	}	*/
-	//echo $_POST["ListOfWorks"];
+	$arr=explode("#",$_POST["ListOfWorks"]);
 	while($i<=$_POST["noOfrows"])
-	{	
-		$cha=substr($_POST["ListOfWorks"],$i-1,1);
-		//echo "-".$cha."-";
-		if(isset($_POST['c'.$cha]))
+	{	echo $arr[$i-1];
+		if(isset($_POST['c'.$arr[$i-1]]))
 		{
-			mysqli_query($conn,"delete from work where WorkId=".$cha);
+			mysqli_query($conn,"delete from work where WorkId=".$arr[$i-1]);
 			$c++;
 		}
 		$i++;
 	}
 	
-	if($c==0)
-	{$err="Please select the entry to delete.";}
-	else	
-	{$err="Entries deleted succesfully";}
+		if($c==0)
+		{$err="Please select the entry to delete.";}
+		else	
+		{$err="Entries deleted succesfully";}
 	
 	}
 	else
@@ -182,21 +169,17 @@ if(isset($_POST["sub4"]))
 $i=1; $c=0;
 if($_POST["noOfrows"]>0)
 	{ 
-	//echo $_POST["noOfrows"];
-	//echo "\n";
-	//echo $_POST["ListOfWorks"];
+	$arr=explode("#",$_POST["ListOfWorks"]);
 	while($i<=$_POST["noOfrows"])
-	{	$cha=substr($_POST["ListOfWorks"],$i-1,1);
-		//echo "-".$cha."-";
-		if(isset($_POST['c'.$cha]))
+	{	
+		if(isset($_POST['c'.$arr[$i-1]]))
 		{	
-			$res=mysqli_query($conn,"select * from work where WorkId=".$cha);
+			$res=mysqli_query($conn,"select * from work where WorkId=".$arr[$i-1]);
 			$row=mysqli_fetch_assoc($res);
 			$WorkId=$row["WorkId"];
 			$Description=$row["Description"];
 			$WorkDate=$row["WorkDate"];	
 			$c=1;
-			//echo "Update time".$i."\n";
 		}
 		if($c==1)
 		{break;}	
@@ -263,16 +246,10 @@ if(mysqli_num_rows($res)>0)
 	<td>'.$row["Description"].'</td>
 	<td>'.$row["WorkDate"].'</td>
 	<td>'.$row["Status"].'</td></tr>';
-	$wl=$wl.$row["WorkId"];
-	//echo $wl;
-	//$arr[$i]=$row["WorkId"];
+	$wl=$wl.$row["WorkId"]."#";
 	}
-	/*$j=1;
-	while($arr[$j])
-	{
-		echo $arr[$j];
-		$j++;
-	}	*/
+	$wl=substr($wl,0,strlen($wl)-1);
+	echo $wl;
 }
 //=======================================Display of the lists completed========================
 ?>
